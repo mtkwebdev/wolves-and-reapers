@@ -1,6 +1,6 @@
 <template>
 	<div class="background">
-		<img v-if="backgroundPath" :src="background" :alt="alt" />
+		<img :src="background" :alt="alt" />
 		<div class="content">
 			<slot></slot>
 		</div>
@@ -8,7 +8,6 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
 const props = defineProps({
 	background: {
 		type: String,
@@ -18,13 +17,6 @@ const props = defineProps({
 		type: String,
 		required: true,
 	},
-});
-
-const backgroundPath = computed(() => {
-	return `@assets/backgrounds/${props.background}.png?url`;
-});
-const backgroundAltText = computed(() => {
-	return `${props.background} background image`;
 });
 </script>
 
@@ -43,7 +35,6 @@ const backgroundAltText = computed(() => {
 	z-index: 2;
 }
 
-/* .content, */
 .background img {
 	position: absolute;
 	top: 0;
