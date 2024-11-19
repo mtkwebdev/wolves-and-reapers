@@ -23,4 +23,9 @@ button {
 	height: 5rem;
 	width: 16rem;
 }
+
+button:last-of-type {
+	background-image: url("@assets/buttonReversed.png");
+	line-height: 5.75rem;
+}
 </style>
