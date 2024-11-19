@@ -17,3 +17,11 @@ body {
 	background-color: black;
 	font-family: "Cinzel", serfif;
 }
+
+.logo {
+	display: flex;
+	width: 20rem;
+	height: auto;
+	object-fit: contain;
+	transform: scale(1.2);
+}

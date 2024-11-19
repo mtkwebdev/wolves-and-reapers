@@ -2,7 +2,7 @@
 	<PageLayout :background="HomeBackgroundImg" alt="Home background image">
 		<div class="home-content-container">
 			<img
-				class="main-logo"
+				class="logo"
 				:src="MainLogo"
 				:alt="wolvesAndReapersLogoDesc"
 				:title="wolvesAndReapersLogoDesc"
@@ -20,7 +20,7 @@
 			</div>
 			<div class="button-container">
 				<Button>Instructions</Button>
-				<Button>Let's play</Button>
+				<Button class="alternative-button">Let's play</Button>
 			</div>
 		</div>
 	</PageLayout>
@@ -50,14 +50,6 @@ const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 	width: 20rem;
 }
 
-.main-logo {
-	position: relative;
-	display: flex;
-	width: 30vh;
-	height: auto;
-	object-fit: contain;
-	transform: scale(1.4);
-}
 .button-container {
 	display: flex;
 	flex-direction: column;

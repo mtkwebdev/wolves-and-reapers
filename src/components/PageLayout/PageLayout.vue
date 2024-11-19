@@ -1,6 +1,6 @@
 <template>
 	<div class="background">
-		<img :src="background" :alt="alt" />
+		<img class="background-img" :src="background" :alt="alt" />
 		<div class="content">
 			<slot></slot>
 		</div>
@@ -35,7 +35,7 @@ const props = defineProps({
 	z-index: 2;
 }
 
-.background img {
+.background-img {
 	position: absolute;
 	top: 0;
 	left: auto;
