@@ -9,7 +9,7 @@
 			/>
 			<div class="intro-text">
 				<p>
-					Your group is lost in a haunted forest, and being chased down by a
+					Your group is lost in a haunted forest and being chased down by a
 					reaper.
 				</p>
 				<p>One of you is also unknowingly a werewolf.</p>
@@ -20,7 +20,7 @@
 			</div>
 			<div class="button-container">
 				<Button>Instructions</Button>
-				<Button class="alternative-button">Let's play</Button>
+				<Button class="alternative-button">Start Playing</Button>
 			</div>
 		</div>
 	</PageLayout>
@@ -28,7 +28,7 @@
 
 <script setup>
 import HomeBackgroundImg from "@assets/backgrounds/home.png";
-import MainLogo from "@assets/alternativeLogo.png";
+import MainLogo from "@assets/mainLogo.png";
 import PageLayout from "../components/PageLayout/PageLayout.vue";
 import Button from "../components/Button/Button.vue";
 
@@ -42,12 +42,16 @@ const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 	place-items: center;
 	justify-content: space-between;
 	height: 50vh;
-	margin-top: 20rem;
+	margin-top: 18rem;
 }
 
 .intro-text {
 	text-align: center;
 	width: 20rem;
+}
+.intro-text > p {
+	font-size: 1.2rem;
+	font-weight: 500;
 }
 
 .button-container {
