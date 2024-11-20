@@ -7,18 +7,8 @@
 				:alt="wolvesAndReapersLogoDesc"
 				:title="wolvesAndReapersLogoDesc"
 			/>
-			<div class="intro-text">
-				<p>
-					Your group is lost in a haunted forest and being chased down by a
-					reaper.
-				</p>
-				<p>One of you is also unknowingly a werewolf.</p>
-				<p>
-					Try to escape by eliminating the Reaper and Werewolf before they
-					eliminate you.
-				</p>
-			</div>
-			<div class="button-container">
+
+			<div class="button-container mt-2">
 				<Button @click="store.setGameStage(instructionsStage)"
 					>Instructions</Button
 				>
@@ -59,17 +49,8 @@ const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 	flex-direction: column;
 	place-items: center;
 	justify-content: space-between;
-	height: 50vh;
-	margin-top: 18rem;
-}
-
-.intro-text {
-	text-align: center;
-	width: 20rem;
-}
-.intro-text > p {
-	font-size: 1.2rem;
-	font-weight: 500;
+	height: 20rem;
+	margin-top: 25rem;
 }
 
 .button-container {

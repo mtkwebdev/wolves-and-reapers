@@ -12,6 +12,18 @@
 			/>
 			<div class="instruction-text-container">
 				<div class="instruction-text">
+					<h2 class="instruction-heading">Introduction</h2>
+					<p>
+						Your group is lost in a haunted forest and being chased down by a
+						reaper.
+					</p>
+					<p>One of you is also unknowingly a werewolf.</p>
+					<p>
+						Try to escape by eliminating the Reaper and Werewolf before they
+						eliminate you.
+					</p>
+				</div>
+				<div class="instruction-text">
 					<h2 class="instruction-heading">Aim of the game</h2>
 					<p class="instruction-text">
 						<strong>Humans:</strong> Survive being caught by the Wolf or Reaper.
@@ -61,6 +73,7 @@
 						Reaper, or by being voted out of the game.
 					</p>
 				</div>
+				<h6>Created By Mohammad Kawadri</h6>
 			</div>
 			<div class="button-container">
 				<Button @click="store.setGameStage(homeStage)">Back</Button>
@@ -84,7 +97,7 @@ const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 <style lang="css" scoped>
 .instruction-heading,
 .instruction-text {
-	font-family: "Readex Pro", serif;
+	font-family: "Cinzel", serif;
 	margin-bottom: 1rem;
 }
 
