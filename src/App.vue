@@ -22,4 +22,6 @@ const gameStages = [
 ];
 </script>
 
-<template><component :is="gameStages[store.gameStage]" /></template>
+<template>
+	<component :is="gameStages[store.gameStage]" />
+</template>
