@@ -9,7 +9,9 @@
 					<TextInput label="Your Name" />
 					<TextInput label="Group Name" />
 
-					<Button>Let's Play</Button>
+					<Button @click="store.setGameStage(gameRoundsStage)"
+						>Let's Play</Button
+					>
 				</Panel>
 			</section>
 			<section>
@@ -26,6 +28,7 @@
 </template>
 
 <script setup>
+import { useGameStore } from "../store/main.js";
 import JoinGameBackgroundImg from "@assets/backgrounds/join.png";
 import AltLogo from "@assets/altLogo.png";
 
@@ -33,6 +36,9 @@ import PageLayout from "../components/PageLayout/PageLayout.vue";
 import Button from "../components/Button/Button.vue";
 import Panel from "../components/Panel/Panel.vue";
 import TextInput from "../components/TextInput/TextInput.vue";
+
+const store = useGameStore();
+const gameRoundsStage = store.gameStages.GameRounds;
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 </script>

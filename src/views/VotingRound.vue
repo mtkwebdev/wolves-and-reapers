@@ -6,7 +6,7 @@
 		<div class="game-rounds-content">
 			<section>
 				<Panel>
-					<h1>Time To Vote!</h1>
+					<h1 class="game-rounds-header">Time To Vote!</h1>
 					<h5>Players Eliminated: 0</h5>
 					<h5>Players Remaining: 0</h5>
 				</Panel>

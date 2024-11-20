@@ -29,3 +29,7 @@ body {
 .text-center {
 	text-align: center;
 }
+
+.game-rounds-header {
+	color: gold;
+}

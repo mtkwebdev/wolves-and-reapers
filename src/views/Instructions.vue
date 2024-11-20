@@ -63,18 +63,21 @@
 				</div>
 			</div>
 			<div class="button-container">
-				<Button>Back</Button>
+				<Button @click="store.setGameStage(homeStage)">Back</Button>
 			</div>
 		</div>
 	</PageLayout>
 </template>
 
 <script setup>
+import { useGameStore } from "../store/main.js";
 import InstructionsBackgroundImg from "@assets/backgrounds/Instructions.png";
 import MainLogo from "@assets/mainLogo.png";
 import PageLayout from "../components/PageLayout/PageLayout.vue";
 import Button from "../components/Button/Button.vue";
 
+const store = useGameStore();
+const homeStage = store.gameStages.Home;
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 </script>
 

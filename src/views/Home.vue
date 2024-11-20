@@ -19,18 +19,30 @@
 				</p>
 			</div>
 			<div class="button-container">
-				<Button>Instructions</Button>
-				<Button class="alternative-button">Start Playing</Button>
+				<Button @click="store.setGameStage(instructionsStage)"
+					>Instructions</Button
+				>
+				<Button
+					@click="store.setGameStage(joinGameStage)"
+					class="alternative-button"
+					>Start Playing</Button
+				>
 			</div>
 		</div>
 	</PageLayout>
 </template>
 
 <script setup>
+import { useGameStore } from "../store/main.js";
 import HomeBackgroundImg from "@assets/backgrounds/home.png";
 import MainLogo from "@assets/mainLogo.png";
 import PageLayout from "../components/PageLayout/PageLayout.vue";
 import Button from "../components/Button/Button.vue";
+
+const store = useGameStore();
+
+const instructionsStage = store.gameStages.Instructions;
+const joinGameStage = store.gameStages.JoinGame;
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 </script>
