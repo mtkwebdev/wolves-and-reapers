@@ -8,7 +8,7 @@
 				:title="wolvesAndReapersLogoDesc"
 			/>
 
-			<div class="button-container mt-2">
+			<div class="button-container">
 				<Button @click="store.setGameStage(instructionsStage)"
 					>Instructions</Button
 				>

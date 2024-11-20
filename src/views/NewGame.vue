@@ -28,7 +28,9 @@
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
-				<div class="join-game-text-container"></div>
+				<div class="button-container">
+					<Button @click="store.setGameStage(homeStage)">Back</Button>
+				</div>
 			</section>
 		</div>
 	</PageLayout>
@@ -49,6 +51,7 @@ import TextInput from "../components/TextInput/TextInput.vue";
 const newGameCode = uuidv4();
 const store = useGameStore();
 const gameRoundsStage = store.gameStages.GameRounds;
+const homeStage = store.gameStages.Home;
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 </script>
