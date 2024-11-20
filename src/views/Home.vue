@@ -23,9 +23,14 @@
 					>Instructions</Button
 				>
 				<Button
+					@click="store.setGameStage(newGameStage)"
+					class="alternative-button"
+					>Start A New Game</Button
+				>
+				<Button
 					@click="store.setGameStage(joinGameStage)"
 					class="alternative-button"
-					>Start Playing</Button
+					>Join A Game</Button
 				>
 			</div>
 		</div>
@@ -42,6 +47,7 @@ import Button from "../components/Button/Button.vue";
 const store = useGameStore();
 
 const instructionsStage = store.gameStages.Instructions;
+const newGameStage = store.gameStages.NewGame;
 const joinGameStage = store.gameStages.JoinGame;
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";

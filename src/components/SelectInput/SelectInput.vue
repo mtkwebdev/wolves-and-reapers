@@ -59,7 +59,7 @@ const inputId = computed(() => {
 
 select {
 	width: 19rem;
-	margin-top: 0.5rem;
+	margin-bottom: 0.5rem;
 	padding: 0.8rem 0.3rem;
 	border-radius: 0.5rem;
 	border: 1px solid gray;
