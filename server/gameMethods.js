@@ -8,8 +8,8 @@ const gameTemplate = {
 };
 
 const playerTemplate = {
+	id: null,
 	username: null,
-	group: null,
 	role: 0,
 	isReady: false,
 	isEliminated: false,
@@ -21,16 +21,26 @@ const playerRoles = {
 	Reaper: 2,
 };
 
-const playerRoleKeys = Object.keys(playerRoles);
-const assignAsAnyPlayerRoles = playerRoles[playerRoleKeys[getRandomInt(2)]];
-const assignAsWolfOrHuman = playerRoles[playerRoleKeys[getRandomInt(1)]];
-const assignAsHuman = playerRoles.Human;
-
 export const getRandomInt = (max) => {
 	return Math.floor(Math.random() * max);
 };
 
-export const setUpNewGame = (username, code, games) => {
+const playerRoleKeys = Object.keys(playerRoles);
+
+const assignAsAnyPlayerRoles = () => {
+	return playerRoles[playerRoleKeys[getRandomInt(3)]];
+};
+
+const assignAsWolfOrHuman = () => {
+	const roles = playerRoleKeys.filter((role) => role !== "Reaper");
+	return playerRoles[playerRoleKeys[getRandomInt(2)]];
+};
+const assignAsReaperOrHuman = () => {
+	const roles = playerRoleKeys.filter((role) => role !== "Wolf");
+	return playerRoles[roles[getRandomInt(2)]];
+};
+
+export const setUpNewGame = (id, code, username, games) => {
 	const isGameAlreadyExists = findGameIndexByCode(code, games).hasIndex;
 
 	if (isGameAlreadyExists) {
@@ -45,8 +55,9 @@ export const setUpNewGame = (username, code, games) => {
 		const newPlayer = playerTemplate;
 
 		// assign initial role for new player
-		newPlayer.role = playerRoles[assignAsAnyPlayerRoles];
+		newPlayer.role = playerRoles[assignAsAnyPlayerRoles] || false;
 		newPlayer.username = username;
+		newPlayer.id = id;
 
 		// update player count
 		newGame.players.push(newPlayer);
@@ -58,7 +69,7 @@ export const setUpNewGame = (username, code, games) => {
 	}
 };
 
-export const createPlayer = (username, code, games) => {
+export const createPlayer = (id, code, username, games) => {
 	const result = {
 		isSuccessful: false,
 		player: null,
@@ -68,6 +79,7 @@ export const createPlayer = (username, code, games) => {
 	const index = findGameIndexByCode(code).index;
 	const newPlayer = playerTemplate;
 	newPlayer.username = username;
+	newPlayer.id = id;
 
 	// check for reapers
 	const isReaperAssigned = games[index]?.players.some((player) => {
@@ -81,15 +93,15 @@ export const createPlayer = (username, code, games) => {
 
 	// assign player a role
 	if (isReaperAssigned) {
-		newPlayer.role = assignAsWolfOrHuman;
+		newPlayer.role = assignAsWolfOrHuman();
 		result.isSuccessful = true;
 	}
 	if (isWolfAssigned) {
-		newPlayer.role = assignAsHuman;
+		newPlayer.role = assignAsReaperOrHuman();
 		result.isSuccessful = true;
 	}
 	if (!isReaperAssigned || !isWolfAssigned) {
-		newPlayer.role = assignAsAnyPlayerRoles;
+		newPlayer.role = assignAsAnyPlayerRoles();
 		result.isSuccessful = true;
 	}
 
@@ -105,7 +117,7 @@ export const findGameIndexByCode = (code, games) => {
 	const gameIndex = games.findIndex((game) => game.code === code);
 
 	// We check if the game index is a number because the index could be 0, which is falsy.
-	const hasGameIndex = typeof gameIndex === "number";
+	const hasGameIndex = typeof gameIndex === "number" && gameIndex > -1;
 
 	if (hasGameIndex) {
 		return { hasIndex: true, index: gameIndex };

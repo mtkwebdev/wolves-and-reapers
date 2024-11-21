@@ -1,5 +1,9 @@
 import { Server } from "socket.io";
-import { setUpNewGame, createPlayer, findGameIndexByCode } from "./gameMethods";
+import {
+	setUpNewGame,
+	createPlayer,
+	findGameIndexByCode,
+} from "./gameMethods.js";
 
 const games = [];
 
@@ -7,14 +11,19 @@ const io = new Server(3000, {
 	cors: {
 		origin: "*",
 	},
+	connectionStateRecovery: {},
 });
 
 io.on("connection", (socket) => {
-	socket.on("new-game", (code, username, callback) => {
-		const newGame = setUpNewGame(code, username, games);
+	console.log("A user connected");
+	socket.on("new-game", (id, code, username, callback) => {
+		// params are in the order of data importance
+		const newGame = setUpNewGame(id, code, username, games);
+
 		if (newGame.isSuccessful) {
 			socket.join(code);
 			games.push(newGame.game);
+
 			// return results
 			callback({ isSuccessful: true, data: newGame, error: newGame.error });
 		} else {
@@ -22,9 +31,9 @@ io.on("connection", (socket) => {
 		}
 	});
 
-	socket.on("join-game", (code, username, callback) => {
+	socket.on("join-game", (id, code, username, callback) => {
 		const index = findGameIndexByCode(code, games).index;
-		const newPlayer = createPlayer(code, username, games);
+		const newPlayer = createPlayer(id, code, username, games);
 
 		// add new player to game
 		if (newPlayer.isSuccessful && index) {
@@ -62,4 +71,4 @@ io.on("connection", (socket) => {
 	});
 });
 
-io.listen(3000);
+io.listen(8888);
