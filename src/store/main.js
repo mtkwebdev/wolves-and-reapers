@@ -1,9 +1,16 @@
 import { defineStore } from "pinia";
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:8888/", { reconnect: true });
+socket.on("connect", () => {
+	console.log("client-connected");
+});
 
 export const useGameStore = defineStore("gameStore", {
 	state: () => {
 		return {
 			gameStage: 0,
+			currentGame: {},
 		};
 	},
 	getters: {
@@ -26,6 +33,29 @@ export const useGameStore = defineStore("gameStore", {
 	actions: {
 		setGameStage(value) {
 			if (this.gameStage <= 9) this.gameStage = value;
+		},
+		newGame(username, code) {
+			// params are in the order of inputs in view
+			socket.emit("new-game", socket.id, code, username, (res) => {
+				console.log(res);
+				if (res.isSuccessful) {
+					this.currentGame = res.data;
+					setGameStage(gameRoundsStage);
+				} else {
+					console.error(res.error);
+				}
+			});
+		},
+		joinGame(username, code) {
+			// params are in the order of inputs in view
+			socket.emit("join-game", socket.id, code, username, (res) => {
+				if (res.isSuccessful) {
+					this.currentGame = res.data;
+					setGameStage(gameRoundsStage);
+				} else {
+					console.error(res.error);
+				}
+			});
 		},
 	},
 });
