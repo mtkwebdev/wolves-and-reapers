@@ -6,12 +6,10 @@
 		<div class="join-game-content">
 			<section>
 				<Panel>
-					<TextInput label="Your Name" />
-					<TextInput label="Game Code" />
+					<TextInput label="Your Name" v-model="username" />
+					<TextInput label="Game Code" v-model="gameCode" />
 
-					<Button @click="store.setGameStage(gameRoundsStage)"
-						>Join Game</Button
-					>
+					<Button @click="store.joinGame(username, gameCode)">Join Game</Button>
 				</Panel>
 			</section>
 			<section>
@@ -30,6 +28,7 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import { useGameStore } from "../store/main.js";
 import JoinGameBackgroundImg from "@assets/backgrounds/join.png";
 import AltLogo from "@assets/altLogo.png";
@@ -40,8 +39,11 @@ import Panel from "../components/Panel/Panel.vue";
 import TextInput from "../components/TextInput/TextInput.vue";
 
 const store = useGameStore();
-const gameRoundsStage = store.gameStages.GameRounds;
+
 const homeStage = store.gameStages.Home;
+
+const username = ref(null);
+const gameCode = ref(null);
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 </script>
