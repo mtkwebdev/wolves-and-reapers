@@ -7,7 +7,7 @@
 			<section>
 				<Panel>
 					<TextInput label="Your Name" />
-					<TextInput label="Group Name" />
+					<TextInput label="Game Code" />
 
 					<Button @click="store.setGameStage(gameRoundsStage)"
 						>Join Game</Button

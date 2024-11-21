@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
+import { setUpNewGame, createPlayer, findGameIndexByCode } from "./gameMethods";
 
-const gamesAsGroupNames = [];
+const games = [];
 
 const io = new Server(3000, {
 	cors: {
@@ -9,35 +10,36 @@ const io = new Server(3000, {
 });
 
 io.on("connection", (socket) => {
-	console.log("connected", socket);
+	socket.on("new-game", (code, username, isSuccessful) => {
+		const newGame = setUpNewGame(code, username, games);
+		if (newGame.isSuccessful) {
+			games.push(newGame.game);
+			isSuccessful(true);
+		} else {
+			isSuccessful(false);
+		}
+	});
+
+	socket.on("join-game", (code, username, isSuccessful) => {
+		const index = findGameIndexByCode(code, games).index;
+		const newPlayer = createPlayer(code, username, games);
+
+		// add new player to game
+		if (newPlayer.isSuccessful && index) {
+			games[index].players.push(newPlayer.player);
+			return isSuccessful(true);
+		}
+		isSuccessful(false);
+	});
+
+	socket.on("get-updated-game-state", (code, updatedState) => {
+		const index = findGameIndexByCode(code, games).index;
+		if (index) {
+			updatedState(games[index]);
+		} else {
+			updatedState(null);
+		}
+	});
 });
 
 io.listen(3000);
-
-// const playerRoles = [
-// 	{
-// 		id: 0,
-// 		name: "Human",
-// 	},
-// 	{
-// 		id: 1,
-// 		name: "Wolf",
-// 	},
-// 	{
-// 		id: 2,
-// 		name: "Reaper",
-// 	},
-// ];
-
-// const playerTemplate = {
-// 	name: null,
-// 	group: null,
-// 	role: {},
-// 	isReady: false,
-// 	isEliminated: false,
-// };
-
-// totalPlayerCount: 0,
-// eliminatedPlayersCount: 0,
-// players: [],
-// player: {},
