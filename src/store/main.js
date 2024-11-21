@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8888/", { reconnect: true });
+const socket = io("http://192.168.1.65:8080/", { reconnect: true });
+
 socket.on("connect", () => {
 	console.log("client-connected");
 });
@@ -37,12 +38,12 @@ export const useGameStore = defineStore("gameStore", {
 		newGame(username, code) {
 			// params are in the order of inputs in view
 			socket.emit("new-game", socket.id, code, username, (res) => {
-				console.log(res);
+				console.log(res.data.game);
 				if (res.isSuccessful) {
 					this.currentGame = res.data;
-					setGameStage(gameRoundsStage);
+					this.setGameStage(this.gameStages.GameRounds);
 				} else {
-					console.error(res.error);
+					Error(res.error);
 				}
 			});
 		},
@@ -50,10 +51,18 @@ export const useGameStore = defineStore("gameStore", {
 			// params are in the order of inputs in view
 			socket.emit("join-game", socket.id, code, username, (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.data;
-					setGameStage(gameRoundsStage);
+					this.setGameStage(this.gameStages.GameRounds);
 				} else {
-					console.error(res.error);
+					Error(res.error);
+				}
+			});
+			this.getExistingGameData();
+		},
+		getExistingGameData(code) {
+			socket.emit("get-updated-game-state", code, (res) => {
+				console.log(res);
+				if (res.isSuccessful) {
+					this.currentGame = res.data;
 				}
 			});
 		},

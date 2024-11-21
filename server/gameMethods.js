@@ -15,58 +15,42 @@ const playerTemplate = {
 	isEliminated: false,
 };
 
-const playerRoles = {
-	Human: 0,
-	Wolf: 1,
-	Reaper: 2,
-};
+const playerRoles = ["Human", "Wolf", "Reaper"];
 
-export const getRandomInt = (max) => {
-	return Math.floor(Math.random() * max);
+export const getRandomInt = (int) => {
+	return Math.floor(Math.random() * int);
 };
-
-const playerRoleKeys = Object.keys(playerRoles);
 
 const assignAsAnyPlayerRoles = () => {
-	return playerRoles[playerRoleKeys[getRandomInt(3)]];
+	return playerRoles[getRandomInt(3)];
 };
 
 const assignAsWolfOrHuman = () => {
-	const roles = playerRoleKeys.filter((role) => role !== "Reaper");
-	return playerRoles[playerRoleKeys[getRandomInt(2)]];
+	const roles = playerRoles.filter((role) => role !== "Reaper");
+	return roles[getRandomInt(2)];
 };
 const assignAsReaperOrHuman = () => {
-	const roles = playerRoleKeys.filter((role) => role !== "Wolf");
-	return playerRoles[roles[getRandomInt(2)]];
+	const roles = playerRoles.filter((role) => role !== "Wolf");
+	return roles[getRandomInt(2)];
 };
 
-export const setUpNewGame = (id, code, username, games) => {
-	const isGameAlreadyExists = findGameIndexByCode(code, games).hasIndex;
+export const setUpNewGame = (id, code, username) => {
+	// create game  and player from templates
+	const newGame = gameTemplate;
+	const newPlayer = playerTemplate;
 
-	if (isGameAlreadyExists) {
-		return {
-			isSuccessful: false,
-			game: null,
-			error: `Error: unable to create game, please refresh the page and try again`,
-		};
-	} else {
-		// create game  and player from templates
-		const newGame = gameTemplate;
-		const newPlayer = playerTemplate;
+	// assign initial role for new player
+	newPlayer.role = assignAsAnyPlayerRoles();
+	newPlayer.username = username;
+	newPlayer.id = id;
 
-		// assign initial role for new player
-		newPlayer.role = playerRoles[assignAsAnyPlayerRoles] || false;
-		newPlayer.username = username;
-		newPlayer.id = id;
+	// update player count
+	newGame.players[0] = newPlayer;
 
-		// update player count
-		newGame.players.push(newPlayer);
+	// assign game code to game state
+	newGame.code = code;
 
-		// assign game code to game state
-		newGame.code = code;
-
-		return { isSuccessful: true, game: newGame, error: "" };
-	}
+	return { isSuccessful: true, game: newGame, error: "" };
 };
 
 export const createPlayer = (id, code, username, games) => {
@@ -75,20 +59,20 @@ export const createPlayer = (id, code, username, games) => {
 		player: null,
 		error: "Error: unable to join game, please check your game code",
 	};
-
-	const index = findGameIndexByCode(code).index;
+	// TO DO: replace with games from redis db
+	const index = findGameIndexByCode(code, games).index;
 	const newPlayer = playerTemplate;
 	newPlayer.username = username;
 	newPlayer.id = id;
 
 	// check for reapers
 	const isReaperAssigned = games[index]?.players.some((player) => {
-		player.role === playerRoles.Reaper;
+		player.role === "Reaper";
 	});
 
 	// check for wolves
 	const isWolfAssigned = games[index]?.players.some((player) => {
-		player.role === playerRoles.Wolf;
+		player.role === "Wolf";
 	});
 
 	// assign player a role
@@ -100,8 +84,8 @@ export const createPlayer = (id, code, username, games) => {
 		newPlayer.role = assignAsReaperOrHuman();
 		result.isSuccessful = true;
 	}
-	if (!isReaperAssigned || !isWolfAssigned) {
-		newPlayer.role = assignAsAnyPlayerRoles();
+	if (isReaperAssigned && isWolfAssigned) {
+		newPlayer.role = "Human";
 		result.isSuccessful = true;
 	}
 
@@ -113,15 +97,18 @@ export const createPlayer = (id, code, username, games) => {
 	return result;
 };
 
+// TO DO: replace with games from redis db
 export const findGameIndexByCode = (code, games) => {
-	const gameIndex = games.findIndex((game) => game.code === code);
+	if (games.length) {
+		const gameIndex = games.findIndex((game) => game.code === code);
 
-	// We check if the game index is a number because the index could be 0, which is falsy.
-	const hasGameIndex = typeof gameIndex === "number" && gameIndex > -1;
+		// We check if the game index is a number because the index could be 0, which is falsy.
+		const hasGameIndex = typeof gameIndex === "number" && gameIndex > -1;
 
-	if (hasGameIndex) {
-		return { hasIndex: true, index: gameIndex };
-	} else {
+		if (hasGameIndex) {
+			return { hasIndex: true, index: gameIndex };
+		}
 		return { hasIndex: false, index: gameIndex };
 	}
+	return { hasIndex: false, index: null };
 };
