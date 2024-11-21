@@ -10,34 +10,54 @@ const io = new Server(3000, {
 });
 
 io.on("connection", (socket) => {
-	socket.on("new-game", (code, username, isSuccessful) => {
+	socket.on("new-game", (code, username, callback) => {
 		const newGame = setUpNewGame(code, username, games);
 		if (newGame.isSuccessful) {
+			socket.join(code);
 			games.push(newGame.game);
-			isSuccessful(true);
+			// return results
+			callback({ isSuccessful: true, data: newGame, error: newGame.error });
 		} else {
-			isSuccessful(false);
+			callback({ isSuccessful: false, data: null, error: newGame.error });
 		}
 	});
 
-	socket.on("join-game", (code, username, isSuccessful) => {
+	socket.on("join-game", (code, username, callback) => {
 		const index = findGameIndexByCode(code, games).index;
 		const newPlayer = createPlayer(code, username, games);
 
 		// add new player to game
 		if (newPlayer.isSuccessful && index) {
+			socket.join(code);
 			games[index].players.push(newPlayer.player);
-			return isSuccessful(true);
+
+			callback({
+				isSuccessful: true,
+				data: games[index],
+				error: newPlayer.error,
+			});
+
+			// update players list in everyone else's game
+			socket.to(code).emit("get-updated-game-state", games[index]);
+		} else {
+			callback({
+				isSuccessful: false,
+				data: games[index],
+				error: newPlayer.error,
+			});
 		}
-		isSuccessful(false);
 	});
 
-	socket.on("get-updated-game-state", (code, updatedState) => {
+	socket.on("get-updated-game-state", (code, callback) => {
 		const index = findGameIndexByCode(code, games).index;
 		if (index) {
-			updatedState(games[index]);
+			callback({ isSuccessful: true, data: games[index], error: "" });
 		} else {
-			updatedState(null);
+			callback({
+				isSuccessful: false,
+				data: games[index],
+				error: "Error: unable to update game, please leave and join again",
+			});
 		}
 	});
 });

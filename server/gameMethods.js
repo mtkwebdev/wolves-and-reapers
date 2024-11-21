@@ -32,8 +32,13 @@ export const getRandomInt = (max) => {
 
 export const setUpNewGame = (username, code, games) => {
 	const isGameAlreadyExists = findGameIndexByCode(code, games).hasIndex;
+
 	if (isGameAlreadyExists) {
-		return { isSuccessful: false, game: null };
+		return {
+			isSuccessful: false,
+			game: null,
+			error: `Error: unable to create game, please refresh the page and try again`,
+		};
 	} else {
 		// create game  and player from templates
 		const newGame = gameTemplate;
@@ -49,12 +54,16 @@ export const setUpNewGame = (username, code, games) => {
 		// assign game code to game state
 		newGame.code = code;
 
-		return { isSuccessful: true, game: newGame };
+		return { isSuccessful: true, game: newGame, error: "" };
 	}
 };
 
 export const createPlayer = (username, code, games) => {
-	const result = { isSuccessful: false, player: null };
+	const result = {
+		isSuccessful: false,
+		player: null,
+		error: "Error: unable to join game, please check your game code",
+	};
 
 	const index = findGameIndexByCode(code).index;
 	const newPlayer = playerTemplate;
@@ -85,6 +94,10 @@ export const createPlayer = (username, code, games) => {
 	}
 
 	result.player = newPlayer;
+
+	if (result.player.role) {
+		result.error = "";
+	}
 	return result;
 };
 
