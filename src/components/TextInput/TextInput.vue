@@ -1,12 +1,13 @@
 <template>
 	<div class="text-input-container">
 		<label :for="inputId">{{ label }}</label>
-		<input :id="inputId" :name="inputId" type="text" />
+		<input :id="inputId" :name="inputId" type="text" v-model="inputValue" />
 	</div>
 </template>
 
 <script setup>
-import { defineProps, computed } from "vue";
+import { computed, defineModel } from "vue";
+
 const props = defineProps({
 	label: {
 		type: String,
@@ -17,6 +18,8 @@ const props = defineProps({
 const inputId = computed(() => {
 	return props.label.replaceAll(" ", "-");
 });
+
+const inputValue = defineModel();
 </script>
 
 <style lang="css" scoped>
