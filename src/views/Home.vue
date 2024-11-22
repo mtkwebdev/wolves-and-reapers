@@ -36,6 +36,8 @@ import Button from "../components/Button/Button.vue";
 
 const store = useGameStore();
 
+store.reconnectToExistingGame();
+
 const instructionsStage = store.gameStages.Instructions;
 const newGameStage = store.gameStages.NewGame;
 const joinGameStage = store.gameStages.JoinGame;
