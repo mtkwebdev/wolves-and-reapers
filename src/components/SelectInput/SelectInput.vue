@@ -1,34 +1,10 @@
 <template>
-	<div class="text-input-container">
+	<div v-if="options && options.length" class="text-input-container">
 		<label :for="inputId">{{ label }}</label>
-		<Select :id="inputId" :name="inputId">
-			<option>Player 1</option>
-			<option>Player 2</option>
-			<option>Player 3</option>
-			<option>Player 4</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player 5</option>
-			<option>Player x</option>
+		<Select :id="inputId" :name="inputId" v-model="selected">
+			<option v-for="option in options" :key="option[optionKey]">
+				{{ optionProperty }}
+			</option>
 		</Select>
 	</div>
 </template>
@@ -40,11 +16,25 @@ const props = defineProps({
 		type: String,
 		required: true,
 	},
+	optionKey: {
+		type: String,
+		required: true,
+	},
+	optionProperty: {
+		type: String,
+		required: true,
+	},
+	options: {
+		type: Array,
+		required: true,
+	},
 });
 
 const inputId = computed(() => {
 	return props.label.replaceAll(" ", "-");
 });
+
+const selected = defineModel();
 </script>
 
 <style lang="css" scoped>
