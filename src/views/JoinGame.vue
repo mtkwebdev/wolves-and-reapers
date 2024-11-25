@@ -1,8 +1,5 @@
 <template>
-	<PageLayout
-		:background="JoinGameBackgroundImg"
-		alt="Join game background image"
-	>
+	<PageLayout :background="backgroundImg" alt="Join game background image">
 		<div class="join-game-content">
 			<section>
 				<Panel>
@@ -30,7 +27,7 @@
 <script setup>
 import { ref } from "vue";
 import { useGameStore } from "../store/main.js";
-import JoinGameBackgroundImg from "@assets/backgrounds/join.png";
+import backgroundImg from "@assets/backgrounds/join.png";
 import AltLogo from "@assets/altLogo.png";
 
 import PageLayout from "../components/PageLayout/PageLayout.vue";
