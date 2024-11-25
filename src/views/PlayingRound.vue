@@ -3,7 +3,7 @@
 		<div class="game-rounds-content">
 			<section>
 				<Panel>
-					<h1 class="game-rounds-header">Time To Vote!</h1>
+					<h1 class="game-rounds-header">{{ store.currentRound }}</h1>
 					<h5>Players Eliminated: {{ store.eliminatedPlayers.count }}</h5>
 					<h5>Players Remaining: {{ store.activePlayers.count }}</h5>
 				</Panel>
@@ -15,37 +15,27 @@
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
-				<SelectInput
-					class="voting-input"
-					label="Choose a player to eliminate"
-					:options="store.activePlayers.players"
-					optionProperty="player"
-					option-key="id"
-					v-model="selectedVote"
-				/>
-
-				<Button v-if="selectedVote" @click="castVote(selectedVote)"
-					>Vote</Button
-				>
+				<div>
+					<h1>Your secret word is:</h1>
+					<h3 class="text-center">Fish Cakes</h3>
+				</div>
+				<Button @click="store.incrementPlayerTurns()">End Turn</Button>
 			</section>
 		</div>
 	</PageLayout>
 </template>
 
 <script setup>
-import { ref } from "vue";
 import backgroundImg from "@assets/backgrounds/game.png";
 import mainLogo from "@assets/mainLogo.png";
 
 import PageLayout from "../components/PageLayout/PageLayout.vue";
 import Button from "../components/Button/Button.vue";
-import SelectInput from "../components/SelectInput/SelectInput.vue";
 import Panel from "../components/Panel/Panel.vue";
 import { useGameStore } from "@store/main.js";
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 const store = useGameStore;
-const selectedVote = ref(null);
 </script>
 
 <style lang="css" scoped>
@@ -80,9 +70,5 @@ section {
 	display: flex;
 	flex-direction: column;
 	place-items: center;
-}
-
-.voting-input {
-	margin-top: 1.2rem;
 }
 </style>
