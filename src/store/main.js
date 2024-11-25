@@ -12,6 +12,7 @@ const cacheKey = "wolves-reapers-cache";
 export const useGameStore = defineStore("gameStore", {
 	state: () => {
 		return {
+			code: null,
 			username: null,
 			gameStage: 0,
 			currentGame: {},
@@ -24,7 +25,7 @@ export const useGameStore = defineStore("gameStore", {
 				Instructions: 1,
 				NewGame: 2,
 				JoinGame: 3,
-				GameRounds: 4,
+				PlayingRound: 4,
 				VotingRound: 5,
 				ReaperWolf: 6,
 				Escape: 7,
@@ -32,6 +33,42 @@ export const useGameStore = defineStore("gameStore", {
 				WolfWin: 9,
 				ReaperWin: 10,
 			};
+		},
+		activePlayers: () => {
+			const players =
+				this.currentGame.players.filter(
+					(player) => player.isEliminated === false
+				)?.length || 0;
+
+			return {
+				count: players?.length,
+				players,
+				usernames: players.map((player) => player?.username),
+			};
+		},
+		eliminatedPlayers: () => {
+			const players =
+				this.currentGame.players.filter(
+					(player) => player.isEliminated === true
+				)?.length || 0;
+
+			return {
+				count: players?.length,
+				players,
+				usernames: players.map((player) => player?.username),
+			};
+		},
+		currentRound: () => {
+			return this.currentGame.currentRound;
+		},
+		totalRounds: () => {
+			return this.currentGame.players?.length || 0;
+		},
+		isVotingRound: () => {
+			return this.currentGame.playerTurns === this.activePlayers.count;
+		},
+		isGameFinished: () => {
+			return currentRound === this.totalRounds && this.gameStage > 7;
 		},
 	},
 	actions: {
@@ -44,58 +81,92 @@ export const useGameStore = defineStore("gameStore", {
 		setCache() {
 			const cache = JSON.stringify(this.currentGame);
 			localStorage.setItem("wolves-reapers-cache", cache);
+			// username is found within an array of users, to find the current user, we have it saved in local storage
 			localStorage.setItem("wolves-reapers-username-cache", this.username);
 		},
 		getCache() {
 			const rawCache = localStorage.getItem("wolves-reapers-cache");
 			if (rawCache) {
 				const cache = JSON.parse(rawCache);
+				this.currentGame = cache;
+				this.code = cache.code;
+				// username is found within an array of users, to find the current user, we have it saved in local storage
 				this.username = localStorage.getItem("wolves-reapers-username-cache");
-				return cache;
+				return true;
 			}
-			return null;
+			return false;
 		},
 		newGame(username, code) {
 			this.username = username;
-			// params are in the order of inputs in view
+			this.code = code;
+
 			socket.emit("new-game", socket.id, code, username, (res) => {
 				if (res.isSuccessful) {
 					this.currentGame = res.game;
-					this.setGameStage(this.gameStages.GameRounds);
+					this.setGameStage(this.gameStages.PlayingRound);
 					this.setCache();
 				} else {
 					Error(res.error);
 				}
 			});
+			this.updateClientState();
 		},
 		joinGame(username, code) {
-			// params are in the order of inputs in view
 			this.username = username;
+			this.code = code;
+
 			socket.emit("join-game", socket.id, code, username, (res) => {
 				if (res.isSuccessful) {
 					this.currentGame = res.game;
-					this.setGameStage(this.gameStages.GameRounds);
+					this.setGameStage(this.gameStages.PlayingRound);
 					this.setCache();
 				} else {
 					Error(res.error);
 				}
 			});
-			this.getExistingGameData();
+			this.updateClientState();
 		},
-		reconnectToExistingGame() {
-			const cache = this.getCache();
-			console.log(cache);
-			if (cache) {
-				this.joinGame(this.username, cache.code);
-			}
-		},
-		getExistingGameData(code) {
-			socket.emit("get-updated-game-state", code, (res) => {
-				console.log(res);
+		incrementPlayerTurns() {
+			socket.emit("increment-turns", this.code, (res) => {
 				if (res.isSuccessful) {
 					this.currentGame = res.data;
 				}
 			});
+
+			if (this.isVotingRound) {
+				this.setGameStage(this.gameStages.VotingRound);
+			}
+		},
+		castVote(votedUsername) {
+			socket.emit("cast-vote", this.code, votedUsername, (res) => {
+				if (res.isSuccessful) {
+					this.currentGame = res.data;
+				}
+			});
+			socket.on("player-eliminated", (res) => {
+				if (res.isSuccessful) {
+					this.currentGame = res.data;
+					this.setGameStage(this.gameStages.PlayingRound);
+				}
+			});
+		},
+		reconnectToExistingGame() {
+			const cache = this.getCache();
+			if (cache) {
+				this.joinGame(this.username, this.code);
+			}
+		},
+		updateClientState() {
+			// runs "update-client" listener
+			socket.on("update-client", (res) => {
+				this.currentGame = res.data;
+			});
+		},
+		endCurrentGame() {
+			if (this.isGameFinished) {
+				socket.emit("end-game", this.code);
+				this.setGameStage(this.gameStages.Home);
+			}
 		},
 	},
 });
