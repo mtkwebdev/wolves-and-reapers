@@ -22,7 +22,7 @@ const gameStages = [
 ];
 
 store.reconnectToExistingGame();
-store.updateClientState();
+store.gameSync();
 </script>
 
 <template>

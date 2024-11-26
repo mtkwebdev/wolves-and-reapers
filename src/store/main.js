@@ -125,13 +125,13 @@ export const useGameStore = defineStore("gameStore", {
 			socket.emit("join-game", socket.id, code, username, (res) => {
 				if (res.isSuccessful) {
 					this.game = res.game;
-					console.log(res);
-					this.setGameStage(this.gameStages.PlayingRound);
 					this.setCache();
+					this.setGameStage(this.gameStages.PlayingRound);
 				} else {
 					Error(res.error);
 				}
 			});
+			this.syncClients();
 		},
 		incrementPlayerTurns() {
 			this.isTurnEnded = true;
@@ -166,10 +166,17 @@ export const useGameStore = defineStore("gameStore", {
 				this.joinGame(this.username, this.code);
 			}
 		},
-		updateClientState() {
-			// runs "update-client" listener
-			socket.on("update-client", (res) => {
-				this.game = res.game;
+		syncClients() {
+			socket.emit("sync-clients");
+		},
+		gameSync() {
+			socket.on("game-sync", (res) => {
+				if (res.isSuccessful) {
+					console.log("synced", this.username);
+					this.game = res.game;
+				} else {
+					Error(res);
+				}
 			});
 		},
 	},
