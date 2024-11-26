@@ -51,7 +51,7 @@ const store = useGameStore();
 
 const homeStage = store.gameStages.Home;
 
-const username = ref(null);
+const username = ref(store.username || null);
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 </script>
