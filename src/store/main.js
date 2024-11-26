@@ -15,7 +15,7 @@ export const useGameStore = defineStore("gameStore", {
 			code: null,
 			username: null,
 			gameStage: 0,
-			currentGame: {},
+			game: {},
 			isTurnEnded: false,
 		};
 	},
@@ -35,41 +35,47 @@ export const useGameStore = defineStore("gameStore", {
 				ReaperWin: 10,
 			};
 		},
-		activePlayers: () => {
-			const players =
-				this.currentGame.players.filter(
-					(player) => player.isEliminated === false
-				)?.length || 0;
+		isGameActive: (state) => {
+			return state.game && state.game?.code;
+		},
+		activePlayers: (state) => {
+			const players = state.isGameActive
+				? state.game?.players.filter((player) => player.isEliminated === false)
+						?.length
+				: 0;
 
 			return {
 				count: players?.length,
 				players,
-				usernames: players.map((player) => player?.username),
+				usernames: players.length
+					? players.map((player) => player.username)
+					: [],
 			};
 		},
-		eliminatedPlayers: () => {
-			const players =
-				this.currentGame.players.filter(
-					(player) => player.isEliminated === true
-				)?.length || 0;
+		eliminatedPlayers: (state) => {
+			const players = state.isGameActive
+				? state.game?.players.filter((player) => player.isEliminated === true)
+						?.length
+				: 0;
 
 			return {
 				count: players?.length,
 				players,
-				usernames: players.map((player) => player?.username),
+				usernames: players.length
+					? players.map((player) => player.username)
+					: [],
 			};
 		},
-		currentRound: () => {
-			return this.currentGame.currentRound;
+		currentRound: (state) => {
+			return state.isGameActive ? state.game?.currentRound : 0;
 		},
-		totalRounds: () => {
-			return this.currentGame.players?.length || 0;
+		totalRounds: (state) => {
+			return state.isGameActive ? state.game?.players?.length : 0;
 		},
-		isVotingRound: () => {
-			return this.currentGame.playerTurns === this.activePlayers.count;
-		},
-		isGameFinished: () => {
-			return currentRound === this.totalRounds && this.gameStage > 7;
+		isVotingRound: (state) => {
+			return state.isGameActive
+				? state.game?.playerTurns === state.activePlayers.count
+				: false;
 		},
 	},
 	actions: {
@@ -78,9 +84,10 @@ export const useGameStore = defineStore("gameStore", {
 		},
 		clearCache() {
 			localStorage.removeItem(cacheKey);
+			localStorage.removeItem("wolves-reapers-username-cache");
 		},
 		setCache() {
-			const cache = JSON.stringify(this.currentGame);
+			const cache = JSON.stringify(this.game);
 			localStorage.setItem("wolves-reapers-cache", cache);
 			// username is found within an array of users, to find the current user, we have it saved in local storage
 			localStorage.setItem("wolves-reapers-username-cache", this.username);
@@ -89,7 +96,7 @@ export const useGameStore = defineStore("gameStore", {
 			const rawCache = localStorage.getItem("wolves-reapers-cache");
 			if (rawCache) {
 				const cache = JSON.parse(rawCache);
-				this.currentGame = cache;
+				this.game = cache;
 				this.code = cache.code;
 				// username is found within an array of users, to find the current user, we have it saved in local storage
 				this.username = localStorage.getItem("wolves-reapers-username-cache");
@@ -103,14 +110,13 @@ export const useGameStore = defineStore("gameStore", {
 
 			socket.emit("new-game", socket.id, code, username, (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.game;
+					this.game = res.game;
 					this.setGameStage(this.gameStages.PlayingRound);
 					this.setCache();
 				} else {
 					Error(res.error);
 				}
 			});
-			this.updateClientState();
 		},
 		joinGame(username, code) {
 			this.username = username;
@@ -118,20 +124,20 @@ export const useGameStore = defineStore("gameStore", {
 
 			socket.emit("join-game", socket.id, code, username, (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.game;
+					this.game = res.game;
+					console.log(res);
 					this.setGameStage(this.gameStages.PlayingRound);
 					this.setCache();
 				} else {
 					Error(res.error);
 				}
 			});
-			this.updateClientState();
 		},
 		incrementPlayerTurns() {
 			this.isTurnEnded = true;
 			socket.emit("increment-turns", this.code, (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.game;
+					this.game = res.game;
 				}
 			});
 
@@ -142,12 +148,12 @@ export const useGameStore = defineStore("gameStore", {
 		castVote(votedUsername) {
 			socket.emit("cast-vote", this.code, votedUsername, (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.game;
+					this.game = res.game;
 				}
 			});
 			socket.on("player-eliminated", (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.game;
+					this.game = res.game;
 					this.setGameStage(this.gameStages.PlayingRound);
 					// reset players turn now that we will enter into a new round
 					this.isTurnEnded = false;
@@ -163,14 +169,8 @@ export const useGameStore = defineStore("gameStore", {
 		updateClientState() {
 			// runs "update-client" listener
 			socket.on("update-client", (res) => {
-				this.currentGame = res.game;
+				this.game = res.game;
 			});
-		},
-		endCurrentGame() {
-			if (this.isGameFinished) {
-				socket.emit("end-game", this.code);
-				this.setGameStage(this.gameStages.Home);
-			}
 		},
 	},
 });
