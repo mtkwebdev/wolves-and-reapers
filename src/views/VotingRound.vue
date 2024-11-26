@@ -45,7 +45,7 @@ import { useGameStore } from "@store/main.js";
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 
-const store = useGameStore;
+const store = useGameStore();
 const selectedVote = ref(null);
 </script>
 

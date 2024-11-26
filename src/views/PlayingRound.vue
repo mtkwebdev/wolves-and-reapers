@@ -2,10 +2,10 @@
 	<PageLayout :background="backgroundImg" alt="Join game background image">
 		<div class="game-rounds-content">
 			<section>
-				<Panel>
-					<h1 class="game-rounds-header">{{ store.currentRound }}</h1>
-					<h5>Players Eliminated: {{ store.eliminatedPlayers.count }}</h5>
-					<h5>Players Remaining: {{ store.activePlayers.count }}</h5>
+				<Panel v-if="store.game?.code">
+					<h1 class="game-rounds-header">Round {{ store?.currentRound }}</h1>
+					<h5>Players Eliminated: {{ store.eliminatedPlayers?.count }}</h5>
+					<h5>Players Remaining: {{ store.activePlayers?.count }}</h5>
 				</Panel>
 			</section>
 			<section>
@@ -37,7 +37,7 @@ import Panel from "../components/Panel/Panel.vue";
 import { useGameStore } from "@store/main.js";
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
-const store = useGameStore;
+const store = useGameStore();
 </script>
 
 <style lang="css" scoped>
