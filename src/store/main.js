@@ -16,6 +16,7 @@ export const useGameStore = defineStore("gameStore", {
 			username: null,
 			gameStage: 0,
 			currentGame: {},
+			isTurnEnded: false,
 		};
 	},
 	getters: {
@@ -127,9 +128,10 @@ export const useGameStore = defineStore("gameStore", {
 			this.updateClientState();
 		},
 		incrementPlayerTurns() {
+			this.isTurnEnded = true;
 			socket.emit("increment-turns", this.code, (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.data;
+					this.currentGame = res.game;
 				}
 			});
 
@@ -140,13 +142,15 @@ export const useGameStore = defineStore("gameStore", {
 		castVote(votedUsername) {
 			socket.emit("cast-vote", this.code, votedUsername, (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.data;
+					this.currentGame = res.game;
 				}
 			});
 			socket.on("player-eliminated", (res) => {
 				if (res.isSuccessful) {
-					this.currentGame = res.data;
+					this.currentGame = res.game;
 					this.setGameStage(this.gameStages.PlayingRound);
+					// reset players turn now that we will enter into a new round
+					this.isTurnEnded = false;
 				}
 			});
 		},
@@ -159,7 +163,7 @@ export const useGameStore = defineStore("gameStore", {
 		updateClientState() {
 			// runs "update-client" listener
 			socket.on("update-client", (res) => {
-				this.currentGame = res.data;
+				this.currentGame = res.game;
 			});
 		},
 		endCurrentGame() {
