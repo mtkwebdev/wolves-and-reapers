@@ -19,7 +19,9 @@
 					<h1>Your secret word is:</h1>
 					<h3 class="text-center">Fish Cakes</h3>
 				</div>
-				<Button @click="store.incrementPlayerTurns()">End Turn</Button>
+				<Button v-if="!store.isTurnEnded" @click="store.incrementPlayerTurns()"
+					>End Turn</Button
+				>
 			</section>
 		</div>
 	</PageLayout>
