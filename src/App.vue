@@ -20,6 +20,9 @@ const gameStages = [
 	"ReaperWolf",
 	"Escape",
 ];
+
+store.reconnectToExistingGame();
+store.updateClientState();
 </script>
 
 <template>
