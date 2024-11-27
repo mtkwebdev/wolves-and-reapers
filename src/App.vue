@@ -7,6 +7,7 @@ import NewGame from "./views/NewGame.vue";
 import JoinGame from "./views/JoinGame.vue";
 import PlayingRound from "./views/PlayingRound.vue";
 import VotingRound from "./views/VotingRound.vue";
+import WolfReaperWin from "./views/WolfReaperWin.vue";
 
 const store = useGameStore();
 
@@ -17,7 +18,7 @@ const gameStages = [
 	JoinGame,
 	PlayingRound,
 	VotingRound,
-	"ReaperWolf",
+	WolfReaperWin,
 	"Escape",
 ];
 

@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 import { io } from "socket.io-client";
 
-const socket = io("http://192.168.1.65:8080/", { reconnect: true });
+// const socket = io("http://192.168.1.65:8080/", { reconnect: false });
+const socket = { on: () => {}, emit: () => {} };
 
 socket.on("connect", () => {
 	console.log("client-connected");
@@ -14,7 +15,7 @@ export const useGameStore = defineStore("gameStore", {
 		return {
 			code: null,
 			username: null,
-			gameStage: 0,
+			gameStage: 6,
 			game: {},
 			isTurnEnded: false,
 			hasVoted: false,
@@ -29,7 +30,7 @@ export const useGameStore = defineStore("gameStore", {
 				JoinGame: 3,
 				PlayingRound: 4,
 				VotingRound: 5,
-				ReaperWolf: 6,
+				WolfReaperWin: 6,
 				Escape: 7,
 				HumanWin: 8,
 				WolfWin: 9,
@@ -84,6 +85,28 @@ export const useGameStore = defineStore("gameStore", {
 		totalRounds: (state) => {
 			return state.isGameActive ? state.game?.players?.length : 0;
 		},
+		hasReaperWon: (state) => {
+			const playerCount = state.activePlayers.length === 2;
+			const isReaperWinner = state.activePlayers.players.includes("Reaper");
+			return playerCount && isReaperWinner;
+		},
+		hasWolfWon: (state) => {
+			const playerCount = state.activePlayers.length === 2;
+			const isWolfWinner = state.activePlayers.players.includes("Wolf");
+			return playerCount && isReaperWinner;
+		},
+		hasHumansWon: (state) => {
+			return !state.hasReaperWon && !state.hasWolfWon;
+		},
+		isPlayerReaper: (state) => {
+			state.currentPlayer.role === "Reaper";
+		},
+		isPlayerWolf: (state) => {
+			state.currentPlayer.role === "Wolf";
+		},
+		isPlayerHuman: (state) => {
+			state.currentPlayer.role === "Human";
+		},
 		isVotingRound: (state) => {
 			return state.isGameActive
 				? state.game?.playerTurns === state.activePlayers.count
@@ -123,15 +146,6 @@ export const useGameStore = defineStore("gameStore", {
 				if (res.isSuccessful) {
 					console.log("synced", this.username);
 					this.game = res.game;
-					if (this.isVotingRound) {
-						this.setGameStage(this.gameStages.VotingRound);
-					}
-					if (!this.isVotingRound) {
-						this.setGameStage(this.gameStages.PlayingRound);
-					}
-					if (this.currentPlayer.isEliminated) {
-						this.setGameStage(this.gameStages.PlayingRound);
-					}
 				} else {
 					Error(res);
 				}
@@ -167,12 +181,6 @@ export const useGameStore = defineStore("gameStore", {
 					this.game = res.game;
 					this.setCache();
 					this.setGameStage(this.gameStages.PlayingRound);
-					if (this.isVotingRound) {
-						this.setGameStage(this.gameStages.VotingRound);
-					}
-					if (this.currentPlayer.isEliminated) {
-						this.setGameStage(this.gameStages.PlayingRound);
-					}
 				} else {
 					Error(res.error);
 				}
@@ -198,12 +206,6 @@ export const useGameStore = defineStore("gameStore", {
 					this.game = res.game;
 					this.isTurnEnded = false;
 					this.hasVoted = false;
-					if (this.currentPlayer.isEliminated) {
-						this.setGameStage(this.gameStages.PlayingRound);
-					}
-					if (!this.isVotingRound) {
-						this.setGameStage(this.gameStages.PlayingRound);
-					}
 				}
 			});
 		},
@@ -211,6 +213,24 @@ export const useGameStore = defineStore("gameStore", {
 			this.getCache();
 			if (this.code) {
 				this.joinGame(this.username, this.code);
+			}
+		},
+		dynamicGameStageSetter() {
+			if (this.currentPlayer.isEliminated) {
+				this.setGameStage(this.gameStages.PlayingRound);
+			}
+			if (!this.isVotingRound) {
+				if (this.hasReaperWon) {
+					this.setGameStage(this.gameStages.PlayingRound);
+				}
+				if (this.hasWolfWon) {
+				}
+				if (this.hasHumansWon) {
+				}
+				this.setGameStage(this.gameStages.PlayingRound);
+			}
+			if (this.isVotingRound) {
+				this.setGameStage(this.gameStages.VotingRound);
 			}
 		},
 		syncClients() {
