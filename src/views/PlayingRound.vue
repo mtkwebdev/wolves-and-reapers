@@ -38,6 +38,7 @@ import { useGameStore } from "@store/main.js";
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 const store = useGameStore();
+store.bindEvents();
 </script>
 
 <style lang="css" scoped>

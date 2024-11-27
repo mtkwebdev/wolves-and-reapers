@@ -104,6 +104,25 @@ export const useGameStore = defineStore("gameStore", {
 			}
 			return false;
 		},
+		bindEvents() {
+			socket.on("game-sync", (res) => {
+				console.log(res);
+				if (res.isSuccessful) {
+					console.log("synced", this.username);
+					this.game = res.game;
+				} else {
+					Error(res);
+				}
+			});
+			socket.on("player-eliminated", (res) => {
+				if (res.isSuccessful) {
+					this.game = res.game;
+					this.setGameStage(this.gameStages.PlayingRound);
+					// reset players turn now that we will enter into a new round
+					this.isTurnEnded = false;
+				}
+			});
+		},
 		newGame(username, code) {
 			this.username = username;
 			this.code = code;
@@ -117,6 +136,7 @@ export const useGameStore = defineStore("gameStore", {
 					Error(res.error);
 				}
 			});
+			this.gameSync();
 		},
 		joinGame(username, code) {
 			this.username = username;
@@ -151,6 +171,8 @@ export const useGameStore = defineStore("gameStore", {
 					this.game = res.game;
 				}
 			});
+		},
+		playerElimination() {
 			socket.on("player-eliminated", (res) => {
 				if (res.isSuccessful) {
 					this.game = res.game;
@@ -171,6 +193,7 @@ export const useGameStore = defineStore("gameStore", {
 		},
 		gameSync() {
 			socket.on("game-sync", (res) => {
+				console.log(res);
 				if (res.isSuccessful) {
 					console.log("synced", this.username);
 					this.game = res.game;
