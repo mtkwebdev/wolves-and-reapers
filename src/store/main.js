@@ -47,6 +47,7 @@ export const useGameStore = defineStore("gameStore", {
 				usernames: players?.length
 					? players.map((player) => player.username)
 					: [],
+				roles: players?.length ? players.map((player) => player.role) : [],
 			};
 		},
 		eliminatedPlayers: (state) => {
@@ -60,6 +61,7 @@ export const useGameStore = defineStore("gameStore", {
 				usernames: players?.length
 					? players.map((player) => player.username)
 					: [],
+				roles: players?.length ? players.map((player) => player.role) : [],
 			};
 		},
 		currentPlayer: (state) => {
@@ -68,6 +70,18 @@ export const useGameStore = defineStore("gameStore", {
 						(player) => player.username === state.username
 				  )
 				: null;
+		},
+		hasCurrentPlayerWon: (state) => {
+			if (state.isPlayerReaper && state.hasReaperWon) {
+				return true;
+			}
+			if (state.isPlayerWolf && state.hasWolfWon) {
+				return true;
+			}
+			if (state.isPlayerHuman && state.isHumanWon) {
+				return true;
+			}
+			return false;
 		},
 		canPlayerTakeTurns: (state) => {
 			return !state.isTurnEnded && state.currentPlayer?.isEliminated === false;
@@ -79,29 +93,31 @@ export const useGameStore = defineStore("gameStore", {
 			return state.isGameActive ? state.game?.currentRound : 0;
 		},
 		totalRounds: (state) => {
-			return state.isGameActive ? state.game?.players?.length : 0;
+			return state.isGameActive ? state.game.players?.length - 1 : 0;
 		},
 		hasReaperWon: (state) => {
-			const playerCount = state.activePlayers.length === 2;
-			const isReaperWinner = state.activePlayers.players.includes("Reaper");
+			const playerCount = state.activePlayers.count === 2;
+			const isReaperWinner = state.activePlayers.roles.includes("Reaper");
 			return playerCount && isReaperWinner;
 		},
 		hasWolfWon: (state) => {
-			const playerCount = state.activePlayers.length === 2;
-			const isWolfWinner = state.activePlayers.players.includes("Wolf");
-			return playerCount && isReaperWinner;
+			const playerCount = state.activePlayers.count === 2;
+			const isWolfWinner = state.activePlayers.roles.includes("Wolf");
+			return playerCount && isWolfWinner;
 		},
 		hasHumansWon: (state) => {
-			return !state.hasReaperWon && !state.hasWolfWon;
+			const playerCount = state.activePlayers.count === 2;
+			const hasHumansWon = !state.hasReaperWon && !state.hasWolfWon;
+			return playerCount && hasHumansWon;
 		},
 		isPlayerReaper: (state) => {
-			state.currentPlayer?.role === "Reaper";
+			return state.currentPlayer.role === "Reaper";
 		},
 		isPlayerWolf: (state) => {
-			state.currentPlayer?.role === "Wolf";
+			return state.currentPlayer.role === "Wolf";
 		},
 		isPlayerHuman: (state) => {
-			state.currentPlayer?.role === "Human";
+			return state.currentPlayer.role === "Human";
 		},
 		isVotingRound: (state) => {
 			return state.isGameActive
@@ -142,15 +158,9 @@ export const useGameStore = defineStore("gameStore", {
 				if (res.isSuccessful) {
 					console.log("synced", this.username);
 					this.game = res.game;
+					this.dynamicGameStageSetter();
 				} else {
 					Error(res);
-				}
-			});
-			socket.on("player-eliminated", (res) => {
-				if (res.isSuccessful) {
-					// reset players turn now that we will enter into a new round
-					this.isTurnEnded = false;
-					this.hasVoted = false;
 				}
 			});
 		},
@@ -161,7 +171,7 @@ export const useGameStore = defineStore("gameStore", {
 			socket.emit("new-game", socket.id, code, username, (res) => {
 				if (res.isSuccessful) {
 					this.game = res.game;
-					this.setGameStage(this.gameStages.PlayingRound);
+					this.dynamicGameStageSetter();
 					this.setCache();
 				} else {
 					Error(res.error);
@@ -176,7 +186,7 @@ export const useGameStore = defineStore("gameStore", {
 				if (res.isSuccessful) {
 					this.game = res.game;
 					this.setCache();
-					this.setGameStage(this.gameStages.PlayingRound);
+					this.dynamicGameStageSetter();
 				} else {
 					Error(res.error);
 				}
@@ -188,11 +198,12 @@ export const useGameStore = defineStore("gameStore", {
 			socket.emit("increment-turns", this.code, (res) => {
 				if (res.isSuccessful) {
 					this.game = res.game;
-					if (this.isVotingRound) {
-						this.setGameStage(this.gameStages.VotingRound);
-					}
+					this.dynamicGameStageSetter();
 				}
 			});
+		},
+		resetTurn() {
+			this.isTurnEnded = false;
 		},
 		castVote(votedUsername) {
 			this.hasVoted = true;
@@ -200,10 +211,12 @@ export const useGameStore = defineStore("gameStore", {
 				if (res.isSuccessful) {
 					console.log("voted", res);
 					this.game = res.game;
-					this.isTurnEnded = false;
-					this.hasVoted = false;
+					this.dynamicGameStageSetter();
 				}
 			});
+		},
+		resetVote() {
+			this.hasVoted = false;
 		},
 		reconnectToExistingGame() {
 			this.getCache();
@@ -212,21 +225,17 @@ export const useGameStore = defineStore("gameStore", {
 			}
 		},
 		dynamicGameStageSetter() {
-			if (this.currentPlayer.isEliminated) {
-				this.setGameStage(this.gameStages.PlayingRound);
-			}
-			if (!this.isVotingRound) {
-				if (this.hasReaperWon) {
-					this.setGameStage(this.gameStages.PlayingRound);
-				}
-				if (this.hasWolfWon) {
-				}
-				if (this.hasHumansWon) {
-				}
+			if (!this.isVotingRound || this.currentPlayer.isEliminated) {
 				this.setGameStage(this.gameStages.PlayingRound);
 			}
 			if (this.isVotingRound) {
 				this.setGameStage(this.gameStages.VotingRound);
+			}
+			if (this.hasReaperWon || this.hasWolfWon) {
+				this.setGameStage(this.gameStages.WolfReaperWin);
+			}
+			if (this.hasHumansWon) {
+				this.setGameStage(this.gameStages.HumansWin);
 			}
 		},
 		syncClients() {

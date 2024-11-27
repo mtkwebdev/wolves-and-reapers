@@ -60,6 +60,7 @@ import { useGameStore } from "@store/main.js";
 const store = useGameStore();
 store.bindEvents();
 window.scrollTo(0, 0);
+store.resetVote();
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 const selectedVote = ref(null);
