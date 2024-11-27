@@ -1,11 +1,11 @@
 <template>
 	<div v-if="options && options.length" class="text-input-container">
 		<label :for="inputId">{{ label }}</label>
-		<Select :id="inputId" :name="inputId" v-model="selected">
+		<select :id="inputId" :name="inputId" v-model="selected">
 			<option v-for="option in options" :key="option[optionKey]">
-				{{ optionProperty }}
+				{{ option[optionProperty] }}
 			</option>
-		</Select>
+		</select>
 	</div>
 </template>
 

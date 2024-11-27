@@ -40,3 +40,18 @@ label {
 	font-size: 1.2rem;
 	font-weight: 600;
 }
+
+.quit-game {
+	margin-top: 2rem;
+}
+
+.game-content {
+	position: absolute;
+	top: 2rem;
+	display: flex;
+	flex-direction: column;
+	place-items: center;
+	justify-content: space-between;
+	height: 100vh;
+	margin: auto;
+}

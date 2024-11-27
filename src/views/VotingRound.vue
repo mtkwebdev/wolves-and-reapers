@@ -1,6 +1,6 @@
 <template>
 	<PageLayout :background="backgroundImg" alt="Join game background image">
-		<div class="game-rounds-content">
+		<div class="game-content">
 			<section>
 				<Panel>
 					<h1 class="game-rounds-header">Time To Vote!</h1>
@@ -16,17 +16,19 @@
 					:title="wolvesAndReapersLogoDesc"
 				/>
 				<SelectInput
+					v-if="store.canPlayerTakeTurns"
 					class="voting-input"
 					label="Choose a player to eliminate"
 					:options="store.activePlayers.players"
-					optionProperty="player"
+					optionProperty="username"
 					option-key="id"
 					v-model="selectedVote"
 				/>
 
-				<Button v-if="selectedVote" @click="castVote(selectedVote)"
+				<Button v-if="selectedVote" @click="store.castVote(selectedVote)"
 					>Vote</Button
 				>
+				<Button class="quit-game" @click="store.clearCache()">Quit game</Button>
 			</section>
 		</div>
 	</PageLayout>
@@ -43,10 +45,11 @@ import SelectInput from "../components/SelectInput/SelectInput.vue";
 import Panel from "../components/Panel/Panel.vue";
 import { useGameStore } from "@store/main.js";
 
-const wolvesAndReapersLogoDesc = "wolves and reapers logo";
-
 const store = useGameStore();
 store.bindEvents();
+window.scrollTo(0, 0);
+
+const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 const selectedVote = ref(null);
 </script>
 
@@ -59,15 +62,6 @@ p {
 
 p {
 	text-align: justify;
-}
-
-.game-rounds-content {
-	display: flex;
-	flex-direction: column;
-	place-items: center;
-	justify-content: space-between;
-	height: 90vh;
-	margin: auto;
 }
 
 .game-rounds-text-container {

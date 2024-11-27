@@ -36,18 +36,17 @@ export const useGameStore = defineStore("gameStore", {
 			};
 		},
 		isGameActive: (state) => {
-			return state.game && state.game?.code;
+			return !!state.game && !!state.game?.code;
 		},
 		activePlayers: (state) => {
 			const players = state.isGameActive
 				? state.game?.players.filter((player) => player.isEliminated === false)
-						?.length
-				: 0;
+				: null;
 
 			return {
 				count: players?.length,
 				players,
-				usernames: players.length
+				usernames: players?.length
 					? players.map((player) => player.username)
 					: [],
 			};
@@ -55,8 +54,7 @@ export const useGameStore = defineStore("gameStore", {
 		eliminatedPlayers: (state) => {
 			const players = state.isGameActive
 				? state.game?.players.filter((player) => player.isEliminated === true)
-						?.length
-				: 0;
+				: null;
 
 			return {
 				count: players?.length,
@@ -65,6 +63,16 @@ export const useGameStore = defineStore("gameStore", {
 					? players.map((player) => player.username)
 					: [],
 			};
+		},
+		currentPlayer: (state) => {
+			return state.isGameActive
+				? state.game.players.find(
+						(player) => player.username === state.username
+				  )
+				: null;
+		},
+		canPlayerTakeTurns: (state) => {
+			return !state.isTurnEnded && state.currentPlayer?.isEliminated === false;
 		},
 		currentRound: (state) => {
 			return state.isGameActive ? state.game?.currentRound : 0;
@@ -84,7 +92,8 @@ export const useGameStore = defineStore("gameStore", {
 		},
 		clearCache() {
 			localStorage.removeItem(cacheKey);
-			localStorage.removeItem("wolves-reapers-username-cache");
+			this.code = null;
+			location.reload();
 		},
 		setCache() {
 			const cache = JSON.stringify(this.game);
@@ -110,6 +119,12 @@ export const useGameStore = defineStore("gameStore", {
 				if (res.isSuccessful) {
 					console.log("synced", this.username);
 					this.game = res.game;
+					if (this.isVotingRound) {
+						this.setGameStage(this.gameStages.VotingRound);
+					}
+					if (this.currentPlayer.isEliminated) {
+						this.setGameStage(this.gameStages.PlayingRound);
+					}
 				} else {
 					Error(res);
 				}
@@ -136,7 +151,6 @@ export const useGameStore = defineStore("gameStore", {
 					Error(res.error);
 				}
 			});
-			this.gameSync();
 		},
 		joinGame(username, code) {
 			this.username = username;
@@ -146,7 +160,12 @@ export const useGameStore = defineStore("gameStore", {
 				if (res.isSuccessful) {
 					this.game = res.game;
 					this.setCache();
-					this.setGameStage(this.gameStages.PlayingRound);
+					if (this.isVotingRound) {
+						this.setGameStage(this.gameStages.VotingRound);
+					}
+					if (this.currentPlayer.isEliminated) {
+						this.setGameStage(this.gameStages.PlayingRound);
+					}
 				} else {
 					Error(res.error);
 				}
@@ -158,27 +177,16 @@ export const useGameStore = defineStore("gameStore", {
 			socket.emit("increment-turns", this.code, (res) => {
 				if (res.isSuccessful) {
 					this.game = res.game;
+					if (this.isVotingRound) {
+						this.setGameStage(this.gameStages.VotingRound);
+					}
 				}
 			});
-
-			if (this.isVotingRound) {
-				this.setGameStage(this.gameStages.VotingRound);
-			}
 		},
 		castVote(votedUsername) {
 			socket.emit("cast-vote", this.code, votedUsername, (res) => {
 				if (res.isSuccessful) {
 					this.game = res.game;
-				}
-			});
-		},
-		playerElimination() {
-			socket.on("player-eliminated", (res) => {
-				if (res.isSuccessful) {
-					this.game = res.game;
-					this.setGameStage(this.gameStages.PlayingRound);
-					// reset players turn now that we will enter into a new round
-					this.isTurnEnded = false;
 				}
 			});
 		},
@@ -190,17 +198,6 @@ export const useGameStore = defineStore("gameStore", {
 		},
 		syncClients() {
 			socket.emit("sync-clients");
-		},
-		gameSync() {
-			socket.on("game-sync", (res) => {
-				console.log(res);
-				if (res.isSuccessful) {
-					console.log("synced", this.username);
-					this.game = res.game;
-				} else {
-					Error(res);
-				}
-			});
 		},
 	},
 });

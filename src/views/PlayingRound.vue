@@ -1,6 +1,6 @@
 <template>
 	<PageLayout :background="backgroundImg" alt="Join game background image">
-		<div class="game-rounds-content">
+		<div class="game-content">
 			<section>
 				<Panel v-if="store.game?.code">
 					<h1 class="game-rounds-header">Round {{ store?.currentRound }}</h1>
@@ -15,13 +15,20 @@
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
-				<div>
+				<div v-if="!store.currentPlayer.isEliminated">
 					<h1>Your secret word is:</h1>
 					<h3 class="text-center">Fish Cakes</h3>
 				</div>
-				<Button v-if="!store.isTurnEnded" @click="store.incrementPlayerTurns()"
+				<div v-else>
+					<h1>You have been eliminated</h1>
+					<h3 class="text-center">Better Luck next time!</h3>
+				</div>
+				<Button
+					v-if="store.canPlayerTakeTurns"
+					@click="store.incrementPlayerTurns()"
 					>End Turn</Button
 				>
+				<Button class="quit-game" @click="store.clearCache()">Quit game</Button>
 			</section>
 		</div>
 	</PageLayout>
@@ -39,6 +46,7 @@ import { useGameStore } from "@store/main.js";
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 const store = useGameStore();
 store.bindEvents();
+window.scrollTo(0, 0);
 </script>
 
 <style lang="css" scoped>
@@ -50,15 +58,6 @@ p {
 
 p {
 	text-align: justify;
-}
-
-.game-rounds-content {
-	display: flex;
-	flex-direction: column;
-	place-items: center;
-	justify-content: space-between;
-	height: 90vh;
-	margin: auto;
 }
 
 .game-rounds-text-container {
