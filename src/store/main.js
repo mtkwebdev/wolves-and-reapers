@@ -14,7 +14,7 @@ export const useGameStore = defineStore("gameStore", {
 		return {
 			code: null,
 			username: null,
-			gameStage: 6,
+			gameStage: 0,
 			game: {},
 			isTurnEnded: false,
 			hasVoted: false,
@@ -30,10 +30,7 @@ export const useGameStore = defineStore("gameStore", {
 				PlayingRound: 4,
 				VotingRound: 5,
 				WolfReaperWin: 6,
-				Escape: 7,
-				HumanWin: 8,
-				WolfWin: 9,
-				ReaperWin: 10,
+				HumansWin: 7,
 			};
 		},
 		isGameActive: (state) => {
@@ -98,13 +95,13 @@ export const useGameStore = defineStore("gameStore", {
 			return !state.hasReaperWon && !state.hasWolfWon;
 		},
 		isPlayerReaper: (state) => {
-			state.currentPlayer.role === "Reaper";
+			state.currentPlayer?.role === "Reaper";
 		},
 		isPlayerWolf: (state) => {
-			state.currentPlayer.role === "Wolf";
+			state.currentPlayer?.role === "Wolf";
 		},
 		isPlayerHuman: (state) => {
-			state.currentPlayer.role === "Human";
+			state.currentPlayer?.role === "Human";
 		},
 		isVotingRound: (state) => {
 			return state.isGameActive
@@ -234,6 +231,10 @@ export const useGameStore = defineStore("gameStore", {
 		},
 		syncClients() {
 			socket.emit("sync-clients");
+		},
+		quitGame() {
+			this.setGameStage(this.gameStages.Home);
+			this.clearCache();
 		},
 	},
 });

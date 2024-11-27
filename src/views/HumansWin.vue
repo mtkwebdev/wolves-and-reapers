@@ -11,21 +11,14 @@
 			</section>
 			<section class="game-end-section game-end-text">
 				<img
-					v-if="store.isPlayerWolf"
-					:src="WolfWinsImg"
+					:src="HumansWin"
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
 
 				<img
-					v-if="store.isPlayerReaper"
-					:src="ReaperWinsImg"
-					:alt="wolvesAndReapersLogoDesc"
-					:title="wolvesAndReapersLogoDesc"
-				/>
-
-				<img
-					:src="HumansLoseImg"
+					class="humans-win-msg"
+					:src="HumansWinMsg"
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
@@ -34,6 +27,7 @@
 
 				<img
 					v-if="store.isPlayerHuman"
+					class="alt-logo"
 					:src="HumansLoseMsgImg"
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
@@ -44,9 +38,9 @@
 </template>
 
 <script setup>
-import backgroundImg from "@assets/backgrounds/humansReaperWin.png";
-import WolfWinsImg from "@assets/wolfWin.png";
-import ReaperWinsImg from "@assets/reaperWin.png";
+import backgroundImg from "@assets/backgrounds/humansWin.png";
+import HumansWin from "@assets/humansWin.png";
+import HumansWinMsg from "@assets/humansWinMsg.png";
 import HumansLoseImg from "@assets/HumansLose.png";
 import HumansLoseMsgImg from "@assets/humansLoseMsg.png";
 
@@ -83,6 +77,10 @@ window.scrollTo(0, 0);
 }
 
 .game-end-text {
-	margin-top: 15rem;
+	margin-top: 13rem;
+}
+
+.humans-win-msg {
+	margin-top: 2rem;
 }
 </style>

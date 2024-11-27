@@ -38,7 +38,7 @@
 						>Vote</Button
 					>
 				</div>
-				<Button class="misc-game-content" @click="store.clearCache()"
+				<Button class="misc-game-content" @click="store.quitGame()"
 					>Quit game</Button
 				>
 			</section>
