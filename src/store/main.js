@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
 import { io } from "socket.io-client";
 
-// const socket = io("http://192.168.1.65:8080/", { reconnect: false });
-const socket = { on: () => {}, emit: () => {} };
+const socket = io("http://192.168.1.65:8080/", { reconnect: false });
 
 socket.on("connect", () => {
 	console.log("client-connected");
