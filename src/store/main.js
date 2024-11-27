@@ -17,6 +17,7 @@ export const useGameStore = defineStore("gameStore", {
 			gameStage: 0,
 			game: {},
 			isTurnEnded: false,
+			hasVoted: false,
 		};
 	},
 	getters: {
@@ -59,7 +60,7 @@ export const useGameStore = defineStore("gameStore", {
 			return {
 				count: players?.length,
 				players,
-				usernames: players.length
+				usernames: players?.length
 					? players.map((player) => player.username)
 					: [],
 			};
@@ -73,6 +74,9 @@ export const useGameStore = defineStore("gameStore", {
 		},
 		canPlayerTakeTurns: (state) => {
 			return !state.isTurnEnded && state.currentPlayer?.isEliminated === false;
+		},
+		canPlayerTakeVote: (state) => {
+			return state.isTurnEnded && state.currentPlayer?.isEliminated === false;
 		},
 		currentRound: (state) => {
 			return state.isGameActive ? state.game?.currentRound : 0;
@@ -102,16 +106,16 @@ export const useGameStore = defineStore("gameStore", {
 			localStorage.setItem("wolves-reapers-username-cache", this.username);
 		},
 		getCache() {
+			// username is found within an array of users, to find the current user, we have it saved in local storage
+			const username = localStorage.getItem("wolves-reapers-username-cache");
+			console.log(username);
+			this.username = username;
 			const rawCache = localStorage.getItem("wolves-reapers-cache");
 			if (rawCache) {
-				const cache = JSON.parse(rawCache);
+				const cache = JSON.parse(rawCache) || {};
 				this.game = cache;
-				this.code = cache.code;
-				// username is found within an array of users, to find the current user, we have it saved in local storage
-				this.username = localStorage.getItem("wolves-reapers-username-cache");
-				return true;
+				this.code = cache?.code || null;
 			}
-			return false;
 		},
 		bindEvents() {
 			socket.on("game-sync", (res) => {
@@ -122,6 +126,9 @@ export const useGameStore = defineStore("gameStore", {
 					if (this.isVotingRound) {
 						this.setGameStage(this.gameStages.VotingRound);
 					}
+					if (!this.isVotingRound) {
+						this.setGameStage(this.gameStages.PlayingRound);
+					}
 					if (this.currentPlayer.isEliminated) {
 						this.setGameStage(this.gameStages.PlayingRound);
 					}
@@ -131,10 +138,9 @@ export const useGameStore = defineStore("gameStore", {
 			});
 			socket.on("player-eliminated", (res) => {
 				if (res.isSuccessful) {
-					this.game = res.game;
-					this.setGameStage(this.gameStages.PlayingRound);
 					// reset players turn now that we will enter into a new round
 					this.isTurnEnded = false;
+					this.hasVoted = false;
 				}
 			});
 		},
@@ -160,6 +166,7 @@ export const useGameStore = defineStore("gameStore", {
 				if (res.isSuccessful) {
 					this.game = res.game;
 					this.setCache();
+					this.setGameStage(this.gameStages.PlayingRound);
 					if (this.isVotingRound) {
 						this.setGameStage(this.gameStages.VotingRound);
 					}
@@ -184,15 +191,25 @@ export const useGameStore = defineStore("gameStore", {
 			});
 		},
 		castVote(votedUsername) {
+			this.hasVoted = true;
 			socket.emit("cast-vote", this.code, votedUsername, (res) => {
 				if (res.isSuccessful) {
+					console.log("voted", res);
 					this.game = res.game;
+					this.isTurnEnded = false;
+					this.hasVoted = false;
+					if (this.currentPlayer.isEliminated) {
+						this.setGameStage(this.gameStages.PlayingRound);
+					}
+					if (!this.isVotingRound) {
+						this.setGameStage(this.gameStages.PlayingRound);
+					}
 				}
 			});
 		},
 		reconnectToExistingGame() {
-			const cache = this.getCache();
-			if (cache) {
+			this.getCache();
+			if (this.code) {
 				this.joinGame(this.username, this.code);
 			}
 		},

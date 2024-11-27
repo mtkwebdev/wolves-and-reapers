@@ -6,6 +6,11 @@
 					<h1 class="game-rounds-header">Time To Vote!</h1>
 					<h5>Players Eliminated: {{ store.eliminatedPlayers.count }}</h5>
 					<h5>Players Remaining: {{ store.activePlayers.count }}</h5>
+					<div class="misc-game-content">
+						<small>Game code:</small>
+						<br />
+						<small>{{ store.code }}</small>
+					</div>
 				</Panel>
 			</section>
 			<section>
@@ -15,20 +20,27 @@
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
-				<SelectInput
-					v-if="store.canPlayerTakeTurns"
-					class="voting-input"
-					label="Choose a player to eliminate"
-					:options="store.activePlayers.players"
-					optionProperty="username"
-					option-key="id"
-					v-model="selectedVote"
-				/>
+				<div v-if="store.hasVoted" class="has-voted-text">
+					Please wait for everyone else's votes
+				</div>
+				<div v-else>
+					<SelectInput
+						v-if="store.canPlayerTakeVote"
+						class="voting-input"
+						label="Choose a player to eliminate"
+						:options="store.activePlayers.players"
+						optionProperty="username"
+						option-key="id"
+						v-model="selectedVote"
+					/>
 
-				<Button v-if="selectedVote" @click="store.castVote(selectedVote)"
-					>Vote</Button
+					<Button v-if="selectedVote" @click="store.castVote(selectedVote)"
+						>Vote</Button
+					>
+				</div>
+				<Button class="misc-game-content" @click="store.clearCache()"
+					>Quit game</Button
 				>
-				<Button class="quit-game" @click="store.clearCache()">Quit game</Button>
 			</section>
 		</div>
 	</PageLayout>
@@ -54,24 +66,6 @@ const selectedVote = ref(null);
 </script>
 
 <style lang="css" scoped>
-h2,
-p {
-	font-family: "Readex Pro", serif;
-	margin-bottom: 1rem;
-}
-
-p {
-	text-align: justify;
-}
-
-.game-rounds-text-container {
-	overflow-y: auto;
-}
-
-.game-rounds-text {
-	width: 22rem;
-	padding: 0rem 2rem 0rem 2rem;
-}
 section {
 	display: flex;
 	flex-direction: column;
@@ -80,5 +74,9 @@ section {
 
 .voting-input {
 	margin-top: 1.2rem;
+}
+
+.has-voted-text {
+	color: white;
 }
 </style>

@@ -6,6 +6,11 @@
 					<h1 class="game-rounds-header">Round {{ store?.currentRound }}</h1>
 					<h5>Players Eliminated: {{ store.eliminatedPlayers?.count }}</h5>
 					<h5>Players Remaining: {{ store.activePlayers?.count }}</h5>
+					<div class="misc-game-content">
+						<small>Game code:</small>
+						<br />
+						<small>{{ store.code }}</small>
+					</div>
 				</Panel>
 			</section>
 			<section>
@@ -28,7 +33,10 @@
 					@click="store.incrementPlayerTurns()"
 					>End Turn</Button
 				>
-				<Button class="quit-game" @click="store.clearCache()">Quit game</Button>
+
+				<Button class="misc-game-content" @click="store.clearCache()"
+					>Quit game</Button
+				>
 			</section>
 		</div>
 	</PageLayout>
