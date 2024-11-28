@@ -242,6 +242,7 @@ export const useGameStore = defineStore("gameStore", {
 			socket.emit("sync-clients");
 		},
 		quitGame() {
+			socket.emit("quit-game", this.code, this.username);
 			this.setGameStage(this.gameStages.Home);
 			this.clearCache();
 		},

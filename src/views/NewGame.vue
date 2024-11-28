@@ -5,20 +5,14 @@
 				<Panel>
 					<TextInput label="Your Name" v-model="username" />
 
-					<div>
-						<label>New game code</label>
-						<button class="new-game-button">
-							{{ newGameCode }}
-							<img class="copy-icon" :src="CopyIcon" alt="copy-icon" />
-						</button>
-					</div>
+					<TextInput label="Game password" v-model="newGameCode" />
 
 					<Button
 						v-if="!store.code"
 						@click="store.newGame(username, newGameCode)"
 						>Start Game</Button
 					>
-					<h1 v-else>Please wait, creating game</h1>
+					<h6 v-else>Please wait, creating game</h6>
 				</Panel>
 			</section>
 			<section>
@@ -49,27 +43,18 @@ import Button from "../components/Button/Button.vue";
 import Panel from "../components/Panel/Panel.vue";
 import TextInput from "../components/TextInput/TextInput.vue";
 
-const newGameCode = uuidv4();
 const store = useGameStore();
 
 const homeStage = store.gameStages.Home;
 
 const username = ref(store.username);
+const newGameCode = ref(null);
+const isCodeCopied = ref();
 
 const wolvesAndReapersLogoDesc = "wolves and reapers logo";
 </script>
 
 <style lang="css" scoped>
-h2,
-p {
-	font-family: "Readex Pro", serif;
-	margin-bottom: 1rem;
-}
-
-p {
-	text-align: justify;
-}
-
 .join-game-content {
 	display: flex;
 	flex-direction: column;
