@@ -222,11 +222,14 @@ export const useGameStore = defineStore("gameStore", {
 			}
 		},
 		dynamicGameStageSetter() {
-			if (!this.isVotingRound || this.currentPlayer.isEliminated) {
+			if (!this.isVotingRound) {
 				this.setGameStage(this.gameStages.PlayingRound);
 			}
 			if (this.isVotingRound) {
 				this.setGameStage(this.gameStages.VotingRound);
+			}
+			if (this.currentPlayer.isEliminated) {
+				this.setGameStage(this.gameStages.PlayingRound);
 			}
 			if (this.hasReaperWon || this.hasWolfWon) {
 				this.setGameStage(this.gameStages.WolfReaperWin);

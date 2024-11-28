@@ -13,9 +13,12 @@
 						</button>
 					</div>
 
-					<Button @click="store.newGame(username, newGameCode)"
+					<Button
+						v-if="!store.code"
+						@click="store.newGame(username, newGameCode)"
 						>Start Game</Button
 					>
+					<h1 v-else>Please wait, creating game</h1>
 				</Panel>
 			</section>
 			<section>
