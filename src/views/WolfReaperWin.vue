@@ -31,14 +31,13 @@
 					:title="wolvesAndReapersLogoDesc"
 				/>
 
-				<Button @click="store.quitGame()">Quit game</Button>
-
 				<img
 					v-if="!store.hasCurrentPlayerWon"
-					:src="HumansLoseMsgImg"
+					:src="playerLosesImg"
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
+				<Button @click="store.quitGame()">Quit game</Button>
 			</section>
 		</div>
 	</PageLayout>
@@ -53,7 +52,7 @@ import reaperWin from "@assets/backgrounds/reaperWin.png";
 import WolfWinsImg from "@assets/wolfWin.png";
 import ReaperWinsImg from "@assets/reaperWin.png";
 import HumansLoseImg from "@assets/HumansLose.png";
-import HumansLoseMsgImg from "@assets/humansLoseMsg.png";
+import playerLosesImg from "@assets/playerLosesMsg.png";
 
 import mainLogo from "@assets/mainLogo.png";
 

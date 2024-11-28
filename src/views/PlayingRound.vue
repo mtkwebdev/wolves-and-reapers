@@ -24,22 +24,22 @@
 				<div
 					v-if="!store.currentPlayer.isEliminated && store.currentPlayer.word"
 				>
-					<h1>Your are a human, your secret word is:</h1>
-					<h3 class="text-center">{{ store.currentPlayer.word }}</h3>
+					<h4 class="text-center">Your are a human, your secret word is:</h4>
+					<h4 class="text-center">{{ store.currentPlayer.word }}</h4>
 				</div>
 
 				<div
 					v-if="!store.currentPlayer.isEliminated && !store.currentPlayer.word"
 				>
-					<h1>You are a reaper, don't have a secret word</h1>
-					<h4 class="text-center">
-						try to describe the word you think everyone else has
-					</h4>
+					<h4 class="text-center">You are the reaper!</h4>
+					<h4 class="text-center">You dont have a secret word</h4>
+					<h5 class="text-center">try to pretend that you have</h5>
+					<h5 class="text-center">the same word as everyone else</h5>
 				</div>
 
 				<div v-if="store.currentPlayer.isEliminated">
-					<h1>You have been eliminated</h1>
-					<h3 class="text-center">Better Luck next time!</h3>
+					<h4 class="text-center">you have been voted out</h4>
+					<h4 class="text-center">You are eliminated!</h4>
 				</div>
 
 				<Button
