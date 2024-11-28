@@ -96,28 +96,25 @@ export const useGameStore = defineStore("gameStore", {
 			return state.isGameActive ? state.game.players?.length - 1 : 0;
 		},
 		hasReaperWon: (state) => {
-			const playerCount = state.activePlayers.count === 2;
 			const isReaperWinner = state.activePlayers.roles.includes("Reaper");
-			return playerCount && isReaperWinner;
+			return state.game.isGameEnd && isReaperWinner;
 		},
 		hasWolfWon: (state) => {
-			const playerCount = state.activePlayers.count === 2;
 			const isWolfWinner = state.activePlayers.roles.includes("Wolf");
-			return playerCount && isWolfWinner;
+			return state.game.isGameEnd && isWolfWinner;
 		},
 		hasHumansWon: (state) => {
-			const playerCount = state.activePlayers.count === 2;
 			const hasHumansWon = !state.hasReaperWon && !state.hasWolfWon;
-			return playerCount && hasHumansWon;
+			return state.game.isGameEnd && hasHumansWon;
 		},
 		isPlayerReaper: (state) => {
-			return state.currentPlayer.role === "Reaper";
+			return state.currentPlayer?.role === "Reaper";
 		},
 		isPlayerWolf: (state) => {
-			return state.currentPlayer.role === "Wolf";
+			return state.currentPlayer?.role === "Wolf";
 		},
 		isPlayerHuman: (state) => {
-			return state.currentPlayer.role === "Human";
+			return state.currentPlayer?.role === "Human";
 		},
 		isVotingRound: (state) => {
 			return state.isGameActive

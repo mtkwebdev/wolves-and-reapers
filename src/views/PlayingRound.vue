@@ -20,14 +20,28 @@
 					:alt="wolvesAndReapersLogoDesc"
 					:title="wolvesAndReapersLogoDesc"
 				/>
-				<div v-if="!store.currentPlayer.isEliminated">
-					<h1>Your secret word is:</h1>
-					<h3 class="text-center">Fish Cakes</h3>
+
+				<div
+					v-if="!store.currentPlayer.isEliminated && store.currentPlayer.word"
+				>
+					<h1>Your are a human, your secret word is:</h1>
+					<h3 class="text-center">{{ store.currentPlayer.word }}</h3>
 				</div>
-				<div v-else>
+
+				<div
+					v-if="!store.currentPlayer.isEliminated && !store.currentPlayer.word"
+				>
+					<h1>You are a reaper, don't have a secret word</h1>
+					<h4 class="text-center">
+						try to describe the word you think everyone else has
+					</h4>
+				</div>
+
+				<div v-if="store.currentPlayer.isEliminated">
 					<h1>You have been eliminated</h1>
 					<h3 class="text-center">Better Luck next time!</h3>
 				</div>
+
 				<Button
 					v-if="store.canPlayerTakeTurns"
 					@click="store.incrementPlayerTurns()"
