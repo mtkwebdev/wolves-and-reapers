@@ -7,12 +7,9 @@
 
 					<TextInput label="Game password" v-model="newGameCode" />
 
-					<Button
-						v-if="!store.code"
-						@click="store.newGame(username, newGameCode)"
+					<Button @click="store.newGame(username, newGameCode)"
 						>Start Game</Button
 					>
-					<h6 v-else>Please wait, creating game</h6>
 				</Panel>
 			</section>
 			<section>

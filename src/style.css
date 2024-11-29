@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Readex+Pro:wght@160..700&display=swap");
 
 :root {
 	font-synthesis: none;
@@ -15,7 +15,7 @@ body {
 	min-height: 100vh;
 	min-width: 100vw;
 	background-color: black;
-	font-family: "Cinzel", serfif;
+	font-family: "cinzel", serfif;
 }
 
 .logo {
@@ -27,6 +27,8 @@ body {
 }
 
 .text-center {
+	display: flex;
+	justify-self: center;
 	text-align: center;
 }
 

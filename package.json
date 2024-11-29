@@ -7,8 +7,7 @@
 		"dev": "vite",
 		"dev-host": "vite --host",
 		"build": "vite build",
-		"preview": "vite preview",
-		"dev-server": "node server/index.js"
+		"preview": "vite preview"
 	},
 	"dependencies": {
 		"pinia": "^2.2.6",

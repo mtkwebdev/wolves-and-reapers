@@ -2,24 +2,22 @@
 	<PageLayout :background="backgroundImg" alt="Join game background image">
 		<div class="game-content">
 			<section>
-				<Panel>
-					<h1 class="game-rounds-header">Time To Vote!</h1>
-					<h5>Players Eliminated: {{ store.eliminatedPlayers.count }}</h5>
-					<h5>Players Remaining: {{ store.activePlayers.count }}</h5>
+				<Panel v-if="store.game?.code">
+					<img
+						class="alt-logo"
+						:src="mainLogo"
+						:alt="wolvesAndReapersLogoDesc"
+						:title="wolvesAndReapersLogoDesc"
+					/>
+					<h1 class="game-rounds-header">It's time to vote!</h1>
+					<PlayerList />
 					<div class="misc-game-content">
-						<small>Game code:</small>
-						<br />
+						<small>Game code: </small>
 						<small>{{ store.code }}</small>
 					</div>
 				</Panel>
 			</section>
 			<section>
-				<img
-					class="alt-logo"
-					:src="mainLogo"
-					:alt="wolvesAndReapersLogoDesc"
-					:title="wolvesAndReapersLogoDesc"
-				/>
 				<div v-if="store.hasVoted" class="has-voted-text">
 					Please wait for everyone else's votes
 				</div>

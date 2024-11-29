@@ -3,24 +3,21 @@
 		<div class="game-content">
 			<section>
 				<Panel v-if="store.game?.code">
+					<img
+						class="alt-logo"
+						:src="mainLogo"
+						:alt="wolvesAndReapersLogoDesc"
+						:title="wolvesAndReapersLogoDesc"
+					/>
 					<h1 class="game-rounds-header">Round {{ store?.currentRound }}</h1>
-					<h5>Players Eliminated: {{ store.eliminatedPlayers?.count }}</h5>
-					<h5>Players Remaining: {{ store.activePlayers?.count }}</h5>
+					<PlayerList />
 					<div class="misc-game-content">
-						<small>Game code:</small>
-						<br />
+						<small>Game code: </small>
 						<small>{{ store.code }}</small>
 					</div>
 				</Panel>
 			</section>
 			<section>
-				<img
-					class="alt-logo"
-					:src="mainLogo"
-					:alt="wolvesAndReapersLogoDesc"
-					:title="wolvesAndReapersLogoDesc"
-				/>
-
 				<div
 					v-if="!store.currentPlayer.isEliminated && store.currentPlayer.word"
 				>
@@ -47,6 +44,7 @@
 					@click="store.incrementPlayerTurns()"
 					>End Turn</Button
 				>
+				<div v-else>Please wait while others take their turns</div>
 
 				<Button class="misc-game-content" @click="store.quitGame()"
 					>Quit game</Button
@@ -62,6 +60,7 @@ import mainLogo from "@assets/mainLogo.png";
 
 import PageLayout from "../components/PageLayout/PageLayout.vue";
 import Button from "../components/Button/Button.vue";
+import PlayerList from "../components/PlayerList/PlayerList.vue";
 import Panel from "../components/Panel/Panel.vue";
 import { useGameStore } from "@store/main.js";
 
