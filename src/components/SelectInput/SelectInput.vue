@@ -53,7 +53,7 @@ select {
 	padding: 0.8rem 0.3rem;
 	border-radius: 0.5rem;
 	border: 1px solid gray;
-	font-family: "Cinzel", serif;
+	font-family: "Readex Pro", serif;
 }
 
 select:focus {

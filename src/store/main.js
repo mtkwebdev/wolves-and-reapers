@@ -227,6 +227,7 @@ export const useGameStore = defineStore("gameStore", {
 			}
 			if (this.isVotingRound) {
 				this.setGameStage(this.gameStages.VotingRound);
+				this.isTurnEnded = true;
 			}
 			if (this.currentPlayer.isEliminated) {
 				this.setGameStage(this.gameStages.PlayingRound);

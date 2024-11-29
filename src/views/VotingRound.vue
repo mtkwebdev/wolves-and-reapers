@@ -21,10 +21,10 @@
 				<div v-if="store.hasVoted" class="has-voted-text">
 					Please wait for everyone else's votes
 				</div>
-				<div v-else>
+				<div v-else class="grid">
 					<SelectInput
 						v-if="store.canPlayerTakeVote"
-						class="voting-input"
+						class="voting-input self-center"
 						label="Choose a player to eliminate"
 						:options="store.activePlayers.players"
 						optionProperty="username"
@@ -32,7 +32,10 @@
 						v-model="selectedVote"
 					/>
 
-					<Button v-if="selectedVote" @click="store.castVote(selectedVote)"
+					<Button
+						v-if="selectedVote"
+						@click="store.castVote(selectedVote)"
+						class="self-center"
 						>Vote</Button
 					>
 				</div>

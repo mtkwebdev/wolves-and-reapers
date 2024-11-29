@@ -18,6 +18,23 @@ body {
 	font-family: "cinzel", serfif;
 }
 
+.self-center {
+	justify-self: center;
+}
+
+.grid {
+	display: grid;
+}
+
+.flex {
+	display: flex;
+}
+
+.flex-col {
+	display: flex;
+	flex-direction: column;
+}
+
 .logo {
 	display: flex;
 	width: 20rem;

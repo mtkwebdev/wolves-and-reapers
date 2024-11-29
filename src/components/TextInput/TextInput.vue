@@ -38,7 +38,7 @@ input {
 	padding: 0.8rem 0.3rem;
 	border-radius: 0.5rem;
 	border: 1px solid gray;
-	font-family: "inter", serif;
+	font-family: "Readex Pro", serif;
 	font-size: 1rem;
 }
 
